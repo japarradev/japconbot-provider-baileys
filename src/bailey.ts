@@ -138,13 +138,22 @@ class BaileysProvider extends ProviderClass<WASocket> {
                     : bindStore({ logger: loggerBaileys })
 
                 if (this.store?.readFromFile) this.store?.readFromFile(`${NAME_DIR_SESSION}/baileys_store.json`)
-
-                setInterval(() => {
-                    const path = `${NAME_DIR_SESSION}/baileys_store.json`
+                
+                const path = `${NAME_DIR_SESSION}/baileys_store.json`
+                const intervalId = setInterval(() => {
+                    
                     if (existsSync(NAME_DIR_SESSION)) {
                         this.store?.writeToFile(path)
+                        if (this.store?.chats.all().length > 0) 
+                        {
+                            clearInterval(intervalId);
+                        }
                     }
                 }, 10_000)
+                
+                setInterval(() => {
+                    this.store.writeToFile(path);
+                }, 1_800_000);
 
                 if (this.globalVendorArgs.timeRelease > 0) {
                     await releaseTmp(NAME_DIR_SESSION, this.globalVendorArgs.timeRelease)

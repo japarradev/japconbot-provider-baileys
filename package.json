@@ -1,7 +1,7 @@
 {
   "name": "japconbot-provider-baileys",
   "version": "1.0.0",
-  "description": "Now I’m the model of a modern major general / The venerated Virginian veteran whose men are all / Lining up, to put me up on a pedestal / Writin’ letters to relatives / Embellishin’ my elegance and eloquence / But the elephant is in the room / The truth is in ya face when ya hear the British cannons go / BOOM",
+  "description": "Provider",
   "keywords": [],
   "author": "j.parra.903@gmail.com",
   "license": "ISC",
@@ -21,14 +21,7 @@
     "src": "src",
     "test": "__tests__"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/codigoencasa/bot-whatsapp.git"
-  },
-  "bugs": {
-    "url": "https://github.com/codigoencasa/bot-whatsapp/issues"
-  },
-  "homepage": "https://github.com/codigoencasa/bot-whatsapp#readme",
+  
   "devDependencies": {
     "@builderbot/bot": "workspace:^",
     "@hapi/boom": "^10.0.1",
