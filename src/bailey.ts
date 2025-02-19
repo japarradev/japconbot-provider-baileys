@@ -128,6 +128,7 @@ class BaileysProvider extends ProviderClass<WASocket> {
         const NAME_DIR_SESSION = `${this.globalVendorArgs.name}_sessions`
         const { state, saveCreds } = await useMultiFileAuthState(NAME_DIR_SESSION)
         const loggerBaileys = pino({ level: 'fatal' })
+        let requireActionAttempts = 0;
 
         this.saveCredsGlobal = saveCreds
 
@@ -215,16 +216,23 @@ class BaileysProvider extends ProviderClass<WASocket> {
                     await sock.waitForConnectionUpdate((update: { qr: any }) => !!update.qr)
                     const phoneNumberClean = utils.removePlus(this.globalVendorArgs.phoneNumber)
                     const code = await sock.requestPairingCode(phoneNumberClean)
-
+                    requireActionAttempts++;
+                    if (requireActionAttempts >= 5) 
+                    {
+                      console.log('Se alcanzó el máximo de intentos. Cerrando la aplicación...');
+                      process.exit(1);
+                    }
                     this.emit('require_action', {
                         title: '⚡⚡ ACTION REQUIRED ⚡⚡',
                         instructions: [
                             `Accept the WhatsApp notification from ${this.globalVendorArgs.phoneNumber} on your phone 👌`,
                             `The token for linking is: ${code}`,
                             `Need help: https://link.codigoencasa.com/DISCORD`,
+                            `Intento ${requireActionAttempts} de 5`,
                         ],
                         payload: { qr: null, code },
                     })
+                    
                 } else {
                     this.emit('auth_failure', [
                         `The phone number has not been defined, please add it`,
@@ -243,6 +251,7 @@ class BaileysProvider extends ProviderClass<WASocket> {
                 if (connection === 'close') {
                     if (statusCode !== DisconnectReason.loggedOut) {
                         this.initVendor().then((v) => this.listenOnEvents(v))
+                        requireActionAttempts = 0;
                         return
                     }
 
@@ -250,6 +259,7 @@ class BaileysProvider extends ProviderClass<WASocket> {
                         const PATH_BASE = join(process.cwd(), NAME_DIR_SESSION)
                         await emptyDirSessions(PATH_BASE)
                         this.initVendor().then((v) => this.listenOnEvents(v))
+                        requireActionAttempts = 0;
                         return
                     }
                 }
@@ -265,12 +275,20 @@ class BaileysProvider extends ProviderClass<WASocket> {
 
                 /** QR Code */
                 if (qr && !this.globalVendorArgs.usePairingCode) {
+                  requireActionAttempts++;
+                  
+                    if (requireActionAttempts >= 5) {
+                        console.log('Se alcanzó el máximo de intentos. Cerrando la aplicación...');
+                        process.exit(1);
+                    }
+                    
                     this.emit('require_action', {
                         title: '⚡⚡ ACTION REQUIRED ⚡⚡',
                         instructions: [
                             `You must scan the QR Code`,
                             `Remember that the QR code updates every minute`,
                             `Need help: https://link.codigoencasa.com/DISCORD`,
+                             `Intento ${requireActionAttempts} de 5`,
                         ],
                         payload: { qr },
                     })
