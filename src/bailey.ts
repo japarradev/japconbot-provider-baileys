@@ -141,6 +141,12 @@ class BaileysProvider extends ProviderClass<WASocket> {
                 if (this.store?.readFromFile) this.store?.readFromFile(`${NAME_DIR_SESSION}/baileys_store.json`)
                 
                 const path = `${NAME_DIR_SESSION}/baileys_store.json`
+                
+                if (this.store?.chats.all().length > 0) 
+                {
+                  require('fs').unlinkSync(path);
+                }
+
                 const intervalId = setInterval(() => {
                     
                     if (existsSync(NAME_DIR_SESSION)) {
@@ -151,10 +157,6 @@ class BaileysProvider extends ProviderClass<WASocket> {
                         }
                     }
                 }, 10_000)
-                
-                setInterval(() => {
-                    this.store.writeToFile(path);
-                }, 1_800_000);
 
                 if (this.globalVendorArgs.timeRelease > 0) {
                     await releaseTmp(NAME_DIR_SESSION, this.globalVendorArgs.timeRelease)
