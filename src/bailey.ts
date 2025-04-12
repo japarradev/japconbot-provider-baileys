@@ -141,7 +141,7 @@ class BaileysProvider extends ProviderClass<WASocket> {
                 if (this.store?.readFromFile) this.store?.readFromFile(`${NAME_DIR_SESSION}/baileys_store.json`)
                 
                 const path = `${NAME_DIR_SESSION}/baileys_store.json`
-                
+
                 if (this.store?.chats.all().length > 0) 
                 {
                   require('fs').unlinkSync(path);
@@ -426,6 +426,13 @@ class BaileysProvider extends ProviderClass<WASocket> {
                 }
 
                 if (payload.from === 'status@broadcast') return
+                
+                if (payload?.key?.fromMe)
+                {
+                  this.emit('FromMeSendMessage', payload);
+                  return;
+                }
+
                 payload.from = baileyCleanNumber(payload.from, true)
 
                 if (this.globalVendorArgs.writeMyself === 'none' && payload?.key?.fromMe) return
